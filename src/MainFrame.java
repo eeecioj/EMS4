@@ -1,5 +1,7 @@
 import javax.swing.*;
 import java.awt.*;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 
 public class MainFrame extends JFrame {
     private JTabbedPane tabbedPane;
@@ -12,7 +14,7 @@ public class MainFrame extends JFrame {
         setLayout(new BorderLayout());
 
         // Create a tabbed pane
-        JTabbedPane tabbedPane = new JTabbedPane();
+        tabbedPane = new JTabbedPane();
 
         // Create and add the employee panel
         JPanel employeePanel = new JPanel();
@@ -50,26 +52,63 @@ public class MainFrame extends JFrame {
         GridBagConstraints gbc = new GridBagConstraints();
         gbc.insets = new Insets(10, 10, 10, 10);
 
-        JButton viewButton = new JButton("View Employee");
-        JButton updateButton = new JButton("Update Employee");
-        JButton deleteButton = new JButton("Delete Employee");
-
+        // Add Employee Button
+        JButton addButton = new JButton("Add Employee");
         gbc.gridx = 0;
-        buttonPanel.add(viewButton, gbc);
+        buttonPanel.add(addButton, gbc);
 
+        // Update Employee Button
+        JButton updateButton = new JButton("Update Employee");
         gbc.gridx = 1;
         buttonPanel.add(updateButton, gbc);
 
+        // Delete Employee Button
+        JButton deleteButton = new JButton("Delete Employee");
         gbc.gridx = 2;
         buttonPanel.add(deleteButton, gbc);
 
         panel.add(buttonPanel, BorderLayout.SOUTH);
 
-        viewButton.addActionListener(e -> viewEmployee());
+        // Add action listeners
+        addButton.addActionListener(e -> addEmployee());
         updateButton.addActionListener(e -> updateEmployee());
         deleteButton.addActionListener(e -> deleteEmployee());
 
         return panel;
+    }
+
+    private void addEmployee() {
+        AddEmployeeFrame addEmployeeFrame = new AddEmployeeFrame(tableModel);
+        addEmployeeFrame.addWindowListener(new WindowAdapter() {
+            @Override
+            public void windowClosed(WindowEvent e) {
+                super.windowClosed(e);
+                // When AddEmployeeFrame is closed, update the table model and refresh the table
+                tableModel.loadDataFromCSV(); // Reload data from CSV file
+                employeeTable.repaint(); // Repaint the table to reflect the changes
+            }
+        });
+        addEmployeeFrame.setVisible(true);
+    }
+
+    private void updateEmployee() {
+        int selectedRow = employeeTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            String employeeNumber = (String) tableModel.getValueAt(selectedRow, 0);
+            new UpdateEmployeeFrame(employeeNumber, tableModel).setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select an employee to update.");
+        }
+    }
+
+    private void deleteEmployee() {
+        int selectedRow = employeeTable.getSelectedRow();
+        if (selectedRow >= 0) {
+            String employeeNumber = (String) tableModel.getValueAt(selectedRow, 0);
+            new DeleteEmployeeFrame(employeeNumber, tableModel).setVisible(true);
+        } else {
+            JOptionPane.showMessageDialog(this, "Please select an employee to delete.");
+        }
     }
 
     private JPanel createTimesheetPanel() {
@@ -148,44 +187,12 @@ public class MainFrame extends JFrame {
         return panel;
     }
 
-    private void viewEmployee() {
-        int selectedRow = employeeTable.getSelectedRow();
-        if (selectedRow >= 0) {
-            String employeeNumber = (String) tableModel.getValueAt(selectedRow, 0);
-            new EmployeeDetailsFrame(employeeNumber).setVisible(true);
-        } else {
-            JOptionPane.showMessageDialog(this, "Please select an employee to view.");
-        }
-    }
-
-    private void updateEmployee() {
-        int selectedRow = employeeTable.getSelectedRow();
-        if (selectedRow >= 0) {
-            String employeeNumber = (String) tableModel.getValueAt(selectedRow, 0);
-            new UpdateEmployeeFrame(employeeNumber, tableModel).setVisible(true);
-        } else {
-            JOptionPane.showMessageDialog(this, "Please select an employee to update.");
-        }
-    }
-
-    private void deleteEmployee() {
-        int selectedRow = employeeTable.getSelectedRow();
-        if (selectedRow >= 0) {
-            String employeeNumber = (String) tableModel.getValueAt(selectedRow, 0);
-            new DeleteEmployeeFrame(employeeNumber, tableModel).setVisible(true);
-        } else {
-            JOptionPane.showMessageDialog(this, "Please select an employee to delete.");
-        }
-    }
-
     private void saveTimesheet() {
         // Logic to save timesheet
         JOptionPane.showMessageDialog(this, "Timesheet saved successfully.");
     }
+
+    public static void main(String[] args) {
+        SwingUtilities.invokeLater(MainFrame::new);
+    }
 }
-
-
-
-
-
-

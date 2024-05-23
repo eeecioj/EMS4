@@ -71,7 +71,21 @@ public class EmployeeTableModel extends AbstractTableModel {
         }
     }
 
-    void deleteEmployee(String employeeNumber) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    // Method to delete an employee
+    public void deleteEmployee(String employeeNumber) {
+        for (int i = 0; i < data.size(); i++) {
+            String[] row = data.get(i);
+            if (row[0].equals(employeeNumber)) {
+                data.remove(i);
+                fireTableDataChanged();
+                return;
+            }
+        }
+    }
+
+    // Method to add a row to the table
+    public void addRow(String[] rowData) {
+        data.add(rowData);
+        fireTableDataChanged();
     }
 }

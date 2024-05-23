@@ -130,4 +130,12 @@ public class UpdateEmployeeFrame extends JFrame {
         // Close the frame
         dispose();
     }
+    
+    public void refreshEmployeeTable() {
+    if (tableModel != null) {
+        tableModel.fireTableDataChanged();
+    }
 }
+
+}
+

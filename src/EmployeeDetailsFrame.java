@@ -150,3 +150,5 @@ public class EmployeeDetailsFrame extends JFrame {
         new EmployeeDetailsFrame("E12345"); // Example employee number
     }
 }
+
+
