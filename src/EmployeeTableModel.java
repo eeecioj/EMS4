@@ -1,5 +1,7 @@
 import javax.swing.table.AbstractTableModel;
-import java.io.*;
+import java.io.BufferedReader;
+import java.io.FileReader;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -8,48 +10,9 @@ public class EmployeeTableModel extends AbstractTableModel {
     private List<String[]> data;
 
     public EmployeeTableModel() {
-        loadEmployeeData();
-    }
-
-    private void loadEmployeeData() {
         data = new ArrayList<>();
-        String csvFile = "employees.csv";
-        String line;
-        String csvSeparator = ",";
-
-        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
-            while ((line = br.readLine()) != null) {
-                String[] rowData = line.split(csvSeparator);
-                data.add(rowData);
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteEmployee(String employeeNumber) {
-        data.removeIf(row -> row[0].equals(employeeNumber));
-        saveEmployeeData();
-        fireTableDataChanged();
-    }
-
-    private void saveEmployeeData() {
-        String csvFile = "employees.csv";
-        try (BufferedWriter bw = new BufferedWriter(new FileWriter(csvFile))) {
-            for (String[] row : data) {
-                StringBuilder rowString = new StringBuilder();
-                for (int i = 0; i < row.length; i++) {
-                    rowString.append(row[i]);
-                    if (i < row.length - 1) {
-                        rowString.append(",");
-                    }
-                }
-                bw.write(rowString.toString());
-                bw.newLine();
-            }
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        // Load data from CSV file
+        loadDataFromCSV("employees.csv");
     }
 
     @Override
@@ -69,29 +32,46 @@ public class EmployeeTableModel extends AbstractTableModel {
 
     @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-        return data.get(rowIndex)[columnIndex];
+        String[] row = data.get(rowIndex);
+        return row[columnIndex];
     }
 
-    public String[] getEmployeeDetails(String employeeNumber) {
-        for (String[] employee : data) {
-            if (employee[0].equals(employeeNumber)) {
-                return employee;
-            }
-        }
-        return null; // Employee not found
+    // Make all cells uneditable
+    @Override
+    public boolean isCellEditable(int rowIndex, int columnIndex) {
+        return false;
     }
 
-    public void updateEmployeeDetails(String employeeNumber, String[] newDetails) {
-        for (String[] employee : data) {
-            if (employee[0].equals(employeeNumber)) {
-                for (int i = 0; i < newDetails.length; i++) {
-                    employee[i + 1] = newDetails[i]; // Update fields, excluding employee number
+    // Method to update employee details
+    public void updateEmployeeDetails(String employeeNumber, String[] updatedDetails) {
+        for (String[] row : data) {
+            if (row[0].equals(employeeNumber)) {
+                // Update the details
+                for (int i = 0; i < updatedDetails.length; i++) {
+                    row[i + 1] = updatedDetails[i]; // Skip the first element (employee number)
                 }
-                saveEmployeeData();
+                // Notify listeners that the data has changed
                 fireTableDataChanged();
-                return;
+                return; // Exit loop once the employee is found and updated
             }
         }
-        // Employee not found, handle accordingly
+    }
+
+    // Method to load data from CSV file
+    private void loadDataFromCSV(String csvFile) {
+        String line;
+        String csvSeparator = ",";
+        try (BufferedReader br = new BufferedReader(new FileReader(csvFile))) {
+            while ((line = br.readLine()) != null) {
+                String[] rowData = line.split(csvSeparator);
+                data.add(rowData);
+            }
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    void deleteEmployee(String employeeNumber) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 }

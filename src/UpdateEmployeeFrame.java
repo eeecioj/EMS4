@@ -1,4 +1,5 @@
 import javax.swing.*;
+import java.awt.*;
 import java.awt.event.*;
 import java.io.BufferedReader;
 import java.io.FileReader;
@@ -128,9 +129,5 @@ public class UpdateEmployeeFrame extends JFrame {
 
         // Close the frame
         dispose();
-    }
-
-    public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new UpdateEmployeeFrame("123", new EmployeeTableModel()).setVisible(true));
     }
 }
